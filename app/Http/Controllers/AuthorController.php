@@ -5,62 +5,74 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAuthorRequest;
 use App\Http\Requests\UpdateAuthorRequest;
 use App\Models\Author;
-
+use App\Models\Book;
 class AuthorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        //
+        $authorsQuery = Author::withCount('books');
+
+        if (request()->has('search') && !empty(request('search'))) {
+            $searchTerm = request('search');
+            $searchTerms = explode(' ', strtolower($searchTerm));
+
+            $authorsQuery->where(function($query) use ($searchTerms) {
+                foreach ($searchTerms as $term) {
+                    $query->where(function($q) use ($term) {
+                        $q->whereRaw('LOWER(first_name) LIKE ?', ['%' . $term . '%'])
+                          ->orWhereRaw('LOWER(last_name) LIKE ?', ['%' . $term . '%']);
+                    });
+                }
+            });
+        }
+
+        $authors = $authorsQuery->latest()->paginate(10);
+
+        $authors->appends(request()->query());
+
+        return view('a-panel.authors.index', compact('authors'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
-        //
+        $books = Book::all();
+        return view('a-panel.authors.create', compact('books'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(StoreAuthorRequest $request)
     {
-        //
+        $author = Author::create($request->validated());
+        return redirect()->route('a-panel.authors');
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(Author $author)
     {
-        //
+        $author->loadCount('books');
+        return view('a-panel.authors.show', compact('author'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit(Author $author)
     {
-        //
+        $books = Book::all();
+        return view('a-panel.authors.edit', compact('author', 'books'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(UpdateAuthorRequest $request, Author $author)
     {
-        //
+        $author->update($request->validated());
+        return redirect()->route('a-panel.authors');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(Author $author)
     {
-        //
+        $author->delete();
+        return redirect()->route('a-panel.authors');
     }
 }

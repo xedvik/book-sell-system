@@ -14,7 +14,7 @@ class Author extends Model
         'first_name',
         'last_name',
         'rank',
-        'avatar_url'
+        'avatar_url',
     ];
 
 

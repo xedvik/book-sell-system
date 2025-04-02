@@ -15,7 +15,7 @@ class Book extends Model
         'description',
         'cover_url',
         'price',
-        'quantity'
+        'quantity',
     ];
 
 

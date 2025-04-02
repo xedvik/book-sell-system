@@ -11,7 +11,7 @@ class StoreSellRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true; // Разрешаем авторизованным пользователям
     }
 
     /**
@@ -22,7 +22,27 @@ class StoreSellRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'book_id' => 'required|exists:books,id',
+            'client_id' => 'required|exists:users,id',
+            'price' => 'required|numeric|min:0',
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'book_id.required' => 'Необходимо выбрать книгу',
+            'book_id.exists' => 'Выбранная книга не существует',
+            'client_id.required' => 'Необходимо выбрать клиента',
+            'client_id.exists' => 'Выбранный клиент не существует',
+            'price.required' => 'Необходимо указать цену',
+            'price.numeric' => 'Цена должна быть числом',
+            'price.min' => 'Цена не может быть отрицательной',
         ];
     }
 }
