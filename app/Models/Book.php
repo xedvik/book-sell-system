@@ -43,12 +43,12 @@ class Book extends Model
      */
     public static function getFilteredBooks($search = null, $sort = null)
     {
-        $query = static::with('authors');
+        $query = static::with('authors')->where('quantity', '>', 0);;
 
         if (!empty($search)) {
-            $query->where(function($q) use ($search) {
-                $q->whereRaw('LOWER(title) LIKE ?', ['%' . strtolower($search) . '%'])
-                  ->orWhereRaw('LOWER(description) LIKE ?', ['%' . strtolower($search) . '%']);
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'ILIKE', "%{$search}%")
+                  ->orWhere('description', 'ILIKE', "%{$search}%");
             });
         }
 
@@ -87,11 +87,11 @@ class Book extends Model
 
         if (!empty($filters)) {
             if (isset($filters['title'])) {
-                $query->whereRaw('LOWER(title) LIKE ?', ['%' . strtolower($filters['title']) . '%']);
+                $query->where('title', 'ILIKE', "%{$filters['title']}%");
             }
 
             if (isset($filters['description'])) {
-                $query->whereRaw('LOWER(description) LIKE ?', ['%' . strtolower($filters['description']) . '%']);
+                $query->where('description', 'ILIKE', "%{$filters['description']}%");
             }
 
             if (isset($filters['min_price'])) {

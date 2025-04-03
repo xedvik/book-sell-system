@@ -10,19 +10,7 @@ use Illuminate\Http\Request;
 
 class BookApiController extends Controller
 {
-    /**
-     * Сервис для работы с книгами
-     *
-     * @var BookService
-     */
     protected $bookService;
-
-    /**
-     * Создать новый экземпляр контроллера
-     *
-     * @param BookService $bookService
-     * @return void
-     */
     public function __construct(BookService $bookService)
     {
         $this->bookService = $bookService;
@@ -98,7 +86,6 @@ class BookApiController extends Controller
                 'data' => isset($result['available']) ? ['available' => $result['available']] : null
             ], 400);
         }
-
         return response()->json([
             'status' => 'success',
             'message' => $result['message'],

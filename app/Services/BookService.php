@@ -74,7 +74,6 @@ class BookService
                 $filters[$filter] = $request->input($filter);
             }
         }
-
         return $filters;
     }
 
@@ -134,7 +133,7 @@ class BookService
                 'sale_id' => $sell->id,
                 'book' => $book,
                 'quantity' => $quantity,
-                'total_price' => $sell->price,
+                'total_price' => (float)$sell->price,
                 'sell' => $sell
             ];
         });
