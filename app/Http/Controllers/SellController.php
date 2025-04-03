@@ -14,24 +14,8 @@ class SellController extends Controller
 
     public function index(Request $request)
     {
-        $query = Sell::query()->with(['book', 'client']);
-
-        if ($request->has('search')) {
-            $query->where('id', 'like', "%{$request->search}%");
-        }
-
-        $stats = [
-            'total_count' => Sell::count(),
-            'total_amount' => Sell::sum('price'),
-            'month_count' => Sell::whereMonth('created_at', now()->month)
-                                ->whereYear('created_at', now()->year)
-                                ->count(),
-            'month_amount' => Sell::whereMonth('created_at', now()->month)
-                                ->whereYear('created_at', now()->year)
-                                ->sum('price'),
-        ];
-
-        $sales = $query->latest()->paginate(10);
+        $sales = Sell::getFilteredSales($request->search);
+        $stats = Sell::getSalesStats();
 
         return view('a-panel.sales.index', compact('sales', 'stats'));
     }

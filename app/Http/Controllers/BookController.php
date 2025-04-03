@@ -11,40 +11,10 @@ class BookController extends Controller
 
     public function index()
     {
-
-        $booksQuery = Book::with('authors');
-
-
-        if (request()->has('search') && !empty(request('search'))) {
-            $searchTerm = request('search');
-            $booksQuery->where(function($query) use ($searchTerm) {
-                $query->whereRaw('LOWER(title) LIKE ?', ['%' . strtolower($searchTerm) . '%'])
-                      ->orWhereRaw('LOWER(description) LIKE ?', ['%' . strtolower($searchTerm) . '%']);
-            });
-        }
-
-        $sort = request('sort');
-        switch ($sort) {
-            case 'price_asc':
-                $booksQuery->orderBy('price', 'asc');
-                break;
-            case 'price_desc':
-                $booksQuery->orderBy('price', 'desc');
-                break;
-            case 'quantity_asc':
-                $booksQuery->orderBy('quantity', 'asc');
-                break;
-            case 'quantity_desc':
-                $booksQuery->orderBy('quantity', 'desc');
-                break;
-            default:
-                $booksQuery->latest();
-                break;
-        }
-
-
-        $books = $booksQuery->paginate(10);
-
+        $books = Book::getFilteredBooks(
+            request('search'),
+            request('sort')
+        );
 
         $books->appends(request()->query());
 

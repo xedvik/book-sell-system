@@ -37,4 +37,24 @@ class User extends Authenticatable
     {
         return $this->hasMany(Sell::class, 'client_id');
     }
+
+    /**
+     * Получить список пользователей с фильтрацией
+     *
+     * @param string|null $search Поисковый запрос
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public static function getFilteredUsers($search = null)
+    {
+        $query = static::withCount('purchases');
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->latest()->paginate(10);
+    }
 }

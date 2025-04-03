@@ -9,23 +9,9 @@ use Illuminate\Validation\Rules;
 
 class UserController extends Controller
 {
-    /**
-     * Отображает список пользователей.
-     */
     public function index(Request $request)
     {
-        $query = User::query()->withCount('purchases');
-
-
-        if ($request->has('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
-
-        $users = $query->latest()->paginate(10);
+        $users = User::getFilteredUsers($request->search);
 
         return view('a-panel.users.index', compact('users'));
     }

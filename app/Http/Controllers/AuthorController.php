@@ -11,23 +11,7 @@ class AuthorController extends Controller
 
     public function index()
     {
-        $authorsQuery = Author::withCount('books');
-
-        if (request()->has('search') && !empty(request('search'))) {
-            $searchTerm = request('search');
-            $searchTerms = explode(' ', strtolower($searchTerm));
-
-            $authorsQuery->where(function($query) use ($searchTerms) {
-                foreach ($searchTerms as $term) {
-                    $query->where(function($q) use ($term) {
-                        $q->whereRaw('LOWER(first_name) LIKE ?', ['%' . $term . '%'])
-                          ->orWhereRaw('LOWER(last_name) LIKE ?', ['%' . $term . '%']);
-                    });
-                }
-            });
-        }
-
-        $authors = $authorsQuery->latest()->paginate(10);
+        $authors = Author::getFilteredAuthors(request('search'));
 
         $authors->appends(request()->query());
 
@@ -51,6 +35,7 @@ class AuthorController extends Controller
 
     public function show(Author $author)
     {
+        // Используем автоматическое внедрение модели Laravel, но добавляем loadCount
         $author->loadCount('books');
         return view('a-panel.authors.show', compact('author'));
     }
