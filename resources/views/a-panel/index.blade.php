@@ -125,7 +125,14 @@
                                             <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                                             </svg>
-                                            {{ $book->author->name ?? 'Без автора' }}
+                                            @if($book->authors && $book->authors->count() > 0)
+                                                {{ $book->authors->first()->first_name }} {{ $book->authors->first()->last_name }}
+                                                @if($book->authors->count() > 1)
+                                                    <span class="text-xs text-gray-500 ml-1">(+{{ $book->authors->count() - 1 }})</span>
+                                                @endif
+                                            @else
+                                                Без автора
+                                            @endif
                                         </p>
                                     </div>
                                     <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
@@ -163,7 +170,7 @@
                                     </p>
                                     <div class="ml-2 flex-shrink-0 flex">
                                         <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            {{ $sale->total }} ₽
+                                            {{ number_format($sale->price, 2) }} ₽
                                         </p>
                                     </div>
                                 </div>
@@ -173,7 +180,7 @@
                                             <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                                             </svg>
-                                            {{ $sale->user->name ?? 'Неизвестный пользователь' }}
+                                            {{ $sale->client->name ?? 'Неизвестный пользователь' }}
                                         </p>
                                     </div>
                                     <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">

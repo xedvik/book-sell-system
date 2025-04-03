@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class BookService
 {
@@ -87,4 +88,58 @@ class BookService
     {
         return $this->getFiltersFromRequest($request);
     }
+
+    /**
+     * Купить книгу
+     *
+     * @param  int  $bookId
+     * @param  int  $userId
+     * @param  int  $quantity
+     * @return array
+     */
+    public function purchaseBook(int $bookId, int $userId, int $quantity = 1): array
+    {
+        $result = DB::transaction(function () use ($bookId, $userId, $quantity) {
+            $book = Book::lockForUpdate()->find($bookId);
+
+            if (!$book) {
+                return [
+                    'success' => false,
+                    'message' => 'Книга не найдена'
+                ];
+            }
+
+            if ($book->quantity < $quantity) {
+                return [
+                    'success' => false,
+                    'message' => 'Недостаточное количество книг в наличии',
+                    'available' => $book->quantity
+                ];
+            }
+
+            $sell = new \App\Models\Sell([
+                'book_id' => $bookId,
+                'client_id' => $userId,
+                'price' => $book->price * $quantity
+            ]);
+            $sell->save();
+
+            $sell->load('book');
+            $book->quantity -= $quantity;
+            $book->save();
+
+            return [
+                'success' => true,
+                'message' => 'Покупка успешно совершена',
+                'sale_id' => $sell->id,
+                'book' => $book,
+                'quantity' => $quantity,
+                'total_price' => $sell->price,
+                'sell' => $sell
+            ];
+        });
+
+        return $result;
+    }
 }
+

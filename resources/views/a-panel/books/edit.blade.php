@@ -2,7 +2,7 @@
 
 @section('title', 'Редактирование книги')
 @section('header', 'Редактирование книги')
-@section('page-title', 'Редактирование книги: {{ $book->title }}')
+@section('page-title', 'Редактирование книги: '.$book->title)
 
 @section('breadcrumbs')
     <nav class="text-sm text-gray-500 mb-4">
