@@ -37,8 +37,8 @@ class Book extends Model
     /**
      * Получить список книг с фильтрацией и сортировкой
      *
-     * @param string|null $search Поисковый запрос
-     * @param string|null $sort Тип сортировки
+     * @param string|null $search
+     * @param string|null $sort
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getFilteredBooks($search = null, $sort = null)
@@ -71,5 +71,51 @@ class Book extends Model
         }
 
         return $query->paginate(10);
+    }
+
+    /**
+     * Получить список книг в продаже с возможностью фильтрации и сортировки
+     *
+     * @param array $filters
+     * @param string|null $sortField
+     * @param string $sortDirection
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public static function getAvailableBooks(array $filters = [], $sortField = null, $sortDirection = 'asc')
+    {
+        $query = static::with('authors')->where('quantity', '>', 0);
+
+        if (!empty($filters)) {
+            if (isset($filters['title'])) {
+                $query->whereRaw('LOWER(title) LIKE ?', ['%' . strtolower($filters['title']) . '%']);
+            }
+
+            if (isset($filters['description'])) {
+                $query->whereRaw('LOWER(description) LIKE ?', ['%' . strtolower($filters['description']) . '%']);
+            }
+
+            if (isset($filters['min_price'])) {
+                $query->where('price', '>=', $filters['min_price']);
+            }
+
+            if (isset($filters['max_price'])) {
+                $query->where('price', '<=', $filters['max_price']);
+            }
+
+            if (isset($filters['min_quantity'])) {
+                $query->where('quantity', '>=', $filters['min_quantity']);
+            }
+        }
+
+        if ($sortField) {
+            $allowedSortFields = ['id', 'title', 'price', 'quantity', 'created_at'];
+            if (in_array($sortField, $allowedSortFields)) {
+                $query->orderBy($sortField, $sortDirection === 'desc' ? 'desc' : 'asc');
+            }
+        } else {
+            $query->latest('id');
+        }
+
+        return $query->get();
     }
 }

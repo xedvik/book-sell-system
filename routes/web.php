@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,15 +24,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/a-panel', function () {
         return view('a-panel.index');
     })->name('a-panel.dashboard');
-
-
-
-
+    require __DIR__ . '/books.php';
+    require __DIR__ . '/author.php';
+    require __DIR__ . '/users.php';
+    require __DIR__ . '/profile.php';
+    require __DIR__ . '/sales.php';
 });
-
-require __DIR__.'/auth.php';
-require __DIR__.'/books.php';
-require __DIR__.'/author.php';
-require __DIR__.'/users.php';
-require __DIR__.'/profile.php';
-require __DIR__.'/sales.php';
+require __DIR__ . '/auth.php';
