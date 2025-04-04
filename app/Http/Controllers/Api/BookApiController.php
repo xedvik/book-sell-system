@@ -8,6 +8,21 @@ use App\Http\Resources\SellResource;
 use App\Services\BookService;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\Info(
+ *     title="Book Store API",
+ *     version="1.0.0",
+ *     description="API для работы с книгами в интернет-магазине"
+ * )
+ * @OA\Server(
+ *     url="http:///localhost:8000/api",
+ *     description="Production server"
+ * )
+ * @OA\Tag(
+ *     name="Books",
+ *     description="Операции с книгами"
+ * )
+ */
 class BookApiController extends Controller
 {
     protected $bookService;
@@ -15,12 +30,20 @@ class BookApiController extends Controller
     {
         $this->bookService = $bookService;
     }
-
-    /**
-     * Получить список книг в продаже
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     /**
+     * @OA\Get(
+     *     path="/books",
+     *     tags={"Books"},
+     *     summary="Получить список книг в продаже",
+     *     description="Возвращает отфильтрованный и отсортированный список книг",
+     *     @OA\Parameter(name="sort_by", in="query", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="sort_direction", in="query", @OA\Schema(type="string", enum={"asc", "desc"}, default="asc")),
+     *     @OA\Parameter(name="title", in="query", @OA\Schema(type="string")),
+     *     @OA\Parameter(name="min_price", in="query", @OA\Schema(type="number", format="float")),
+     *     @OA\Parameter(name="max_price", in="query", @OA\Schema(type="number", format="float")),
+     *     @OA\Parameter(name="min_quantity", in="query", @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Успешный запрос", @OA\JsonContent(ref="#/components/schemas/BooksListResponse"))
+     * )
      */
     public function index(Request $request)
     {
@@ -42,11 +65,15 @@ class BookApiController extends Controller
         ]);
     }
 
-    /**
-     * Получить детальную информацию о книге
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     /**
+     * @OA\Get(
+     *     path="/books/{id}",
+     *     tags={"Books"},
+     *     summary="Получить детальную информацию о книге",
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Успешный запрос", @OA\JsonContent(ref="#/components/schemas/BookDetailResponse")),
+     *     @OA\Response(response=404, description="Книга не найдена", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
      */
     public function show($id)
     {
@@ -66,11 +93,23 @@ class BookApiController extends Controller
     }
 
     /**
-     * Купить книгу
-     *
-     * @param  \App\Http\Requests\Api\PurchaseBookRequest  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @OA\Post(
+     *     path="/books/{id}/purchase",
+     *     tags={"Books"},
+     *     summary="Купить книгу",
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"user_id"},
+     *             @OA\Property(property="user_id", type="integer", example=1),
+     *             @OA\Property(property="quantity", type="integer", example=1, default=1)
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Книга успешно куплена", @OA\JsonContent(ref="#/components/schemas/PurchaseResponse")),
+     *     @OA\Response(response=400, description="Ошибка при покупке", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=404, description="Книга не найдена", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
      */
     public function purchase(\App\Http\Requests\Api\PurchaseBookRequest $request, $id)
     {
