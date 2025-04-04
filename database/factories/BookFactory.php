@@ -17,7 +17,11 @@ class BookFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'title' => $this->faker->sentence(3), // Около 3-5 слов
+            'description' => $this->faker->text(200), // Ограничиваем 200 символами
+            'cover_url' => $this->faker->imageUrl(640, 480, 'book'),
+            'price' => $this->faker->randomFloat(2, 100, 5000),
+            'quantity' => $this->faker->numberBetween(0, 50),
         ];
     }
 }

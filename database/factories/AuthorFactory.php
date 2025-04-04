@@ -17,7 +17,10 @@ class AuthorFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'first_name' => $this->faker->firstName(),
+            'last_name' => $this->faker->lastName(),
+            'rank' => $this->faker->numberBetween(1, 100),
+            'avatar_url' => $this->faker->imageUrl(640, 480, 'people'),
         ];
     }
 }
