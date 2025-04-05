@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Book extends Model
 {
@@ -79,11 +80,12 @@ class Book extends Model
      * @param array $filters
      * @param string|null $sortField
      * @param string $sortDirection
+     * @param bool $withAuthorAvatar
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getAvailableBooks(array $filters = [], $sortField = null, $sortDirection = 'asc')
+    public static function getAvailableBooks(array $filters = [], $sortField = null, $sortDirection = 'asc', $withAuthorAvatar = false)
     {
-        $query = static::with('authors')->where('quantity', '>', 0);
+        $query = static::with('authors')->withCount('sells')->where('quantity', '>', 0);
 
         if (!empty($filters)) {
             if (isset($filters['title'])) {
@@ -107,8 +109,75 @@ class Book extends Model
             }
         }
 
+        // Фильтр по наличию аватарки у авторов
+        if ($withAuthorAvatar) {
+            $query->whereHas('authors', function($q) {
+                $q->whereNotNull('avatar_url')
+                  ->where('avatar_url', '!=', '');
+            });
+        }
+
         if ($sortField) {
-            $allowedSortFields = ['id', 'title', 'price', 'quantity', 'created_at'];
+            $allowedSortFields = ['id', 'title', 'price', 'quantity', 'created_at','sells_count'];
+            if (in_array($sortField, $allowedSortFields)) {
+                $query->orderBy($sortField, $sortDirection === 'desc' ? 'desc' : 'asc');
+            }
+        } else {
+            $query->latest('id');
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Получить книги авторов с высоким рейтингом или с большим количеством продаж за сегодня
+     *
+     * @param array $filters
+     * @param string|null $sortField
+     * @param string $sortDirection
+     * @param int $minAuthorRank
+     * @param int $minTodaySales
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public static function getBooksHighRankOrTopSales(array $filters = [], $sortField = null, $sortDirection = 'asc', $minAuthorRank = 75, $minTodaySales = 3)
+    {
+        $query = static::with('authors')
+            ->withCount('sells')
+            ->where('quantity', '>', 0);
+
+        if (!empty($filters)) {
+            if (isset($filters['title'])) {
+                $query->where('title', 'ILIKE', "%{$filters['title']}%");
+            }
+
+            if (isset($filters['description'])) {
+                $query->where('description', 'ILIKE', "%{$filters['description']}%");
+            }
+
+            if (isset($filters['min_price'])) {
+                $query->where('price', '>=', $filters['min_price']);
+            }
+
+            if (isset($filters['max_price'])) {
+                $query->where('price', '<=', $filters['max_price']);
+            }
+
+            if (isset($filters['min_quantity'])) {
+                $query->where('quantity', '>=', $filters['min_quantity']);
+            }
+        }
+
+        $query->where(function($q) use ($minAuthorRank, $minTodaySales) {
+
+            $q->whereHas('authors', function($authorQuery) use ($minAuthorRank) {
+                $authorQuery->where('rank', '>', $minAuthorRank);
+            });
+
+            $q->orWhereRaw('(SELECT COUNT(*) FROM sells WHERE sells.book_id = books.id AND DATE(sells.created_at) = ?) > ?', [now()->toDateString(), $minTodaySales]);
+        });
+
+        if ($sortField) {
+            $allowedSortFields = ['id', 'title', 'price', 'quantity', 'created_at', 'sells_count'];
             if (in_array($sortField, $allowedSortFields)) {
                 $query->orderBy($sortField, $sortDirection === 'desc' ? 'desc' : 'asc');
             }

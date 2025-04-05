@@ -22,10 +22,14 @@ class BookService
 
         $filters = $this->getFiltersFromRequest($request);
 
+        // Добавляем фильтр по наличию аватарки у автора
+        $withAuthorAvatar = $request->has('with_author_avatar') ? (bool)$request->input('with_author_avatar') : false;
+
         return Book::getAvailableBooks(
             $filters,
             $sortField,
-            $sortDirection
+            $sortDirection,
+            $withAuthorAvatar
         );
     }
 
@@ -74,6 +78,12 @@ class BookService
                 $filters[$filter] = $request->input($filter);
             }
         }
+
+        // Добавляем фильтр по наличию аватарки у автора
+        if ($request->has('with_author_avatar')) {
+            $filters['with_author_avatar'] = (bool)$request->input('with_author_avatar');
+        }
+
         return $filters;
     }
 
@@ -85,7 +95,40 @@ class BookService
      */
     public function getRequestFilters(Request $request): array
     {
-        return $this->getFiltersFromRequest($request);
+        // Получаем все базовые фильтры
+        $filters = $this->getFiltersFromRequest($request);
+
+        // Исключаем специальные фильтры, которые обрабатываются отдельно
+        if (isset($filters['with_author_avatar'])) {
+            unset($filters['with_author_avatar']);
+        }
+
+        return $filters;
+    }
+
+    /**
+     * Получить книги авторов с высоким рейтингом или с большим количеством продаж за сегодня
+     *
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getBooksHighRankOrTopSales(Request $request)
+    {
+        $sortField = $request->input('sort_by');
+        $sortDirection = $request->input('sort_direction', 'asc');
+
+        $filters = $this->getFiltersFromRequest($request);
+
+        $minAuthorRank = $request->input('min_author_rank', 75);
+        $minTodaySales = $request->input('min_today_sales', 3);
+
+        return Book::getBooksHighRankOrTopSales(
+            $filters,
+            $sortField,
+            $sortDirection,
+            $minAuthorRank,
+            $minTodaySales
+        );
     }
 
     /**

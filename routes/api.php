@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix('books')->group(function () {
     Route::get('/', [BookApiController::class, 'index']);
+    Route::get('/top', [BookApiController::class, 'topBooks']);
     Route::get('/{id}', [BookApiController::class, 'show']);
     Route::post('/{id}/purchase', [BookApiController::class, 'purchase']);
 });

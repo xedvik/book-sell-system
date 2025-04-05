@@ -21,6 +21,7 @@ class BookResource extends JsonResource
             'cover_url' => $this->cover_url,
             'price' => (float) $this->price,
             'quantity' => $this->quantity,
+            'sells_count' => $this->sells_count,
             'authors' => AuthorResource::collection($this->whenLoaded('authors')),
             'in_stock' => $this->quantity > 0,
             'created_at' => $this->created_at,

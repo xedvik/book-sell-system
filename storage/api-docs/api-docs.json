@@ -24,8 +24,18 @@
                     {
                         "name": "sort_by",
                         "in": "query",
+                        "description": "Поле для сортировки (доступные значения: id, title - название, price - цена, quantity - количество, created_at - дата создания, sells_count - количество продаж)",
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "default": "id",
+                            "enum": [
+                                "id",
+                                "title",
+                                "price",
+                                "quantity",
+                                "created_at",
+                                "sells_count"
+                            ]
                         }
                     },
                     {
@@ -68,6 +78,15 @@
                         "in": "query",
                         "schema": {
                             "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "with_author_avatar",
+                        "in": "query",
+                        "description": "Показать только книги авторов с аватарками",
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
                         }
                     }
                 ],
@@ -200,6 +219,105 @@
                     }
                 }
             }
+        },
+        "/books/top": {
+            "get": {
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Получить список книг авторов с высоким рейтингом или с высокими продажами за сегодня",
+                "description": "Возвращает список книг у авторов которых рейтинг выше 75 либо количество продаж за текущий день больше 3",
+                "operationId": "77bd082372aca2d099ef0a620a29addb",
+                "parameters": [
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Поле для сортировки (доступные значения: id, title - название, price - цена, quantity - количество, created_at - дата создания, sells_count - количество продаж)",
+                        "schema": {
+                            "type": "string",
+                            "default": "id",
+                            "enum": [
+                                "id",
+                                "title",
+                                "price",
+                                "quantity",
+                                "created_at",
+                                "sells_count"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_direction",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "default": "asc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "title",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "min_price",
+                        "in": "query",
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "max_price",
+                        "in": "query",
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "min_quantity",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "min_author_rank",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 75
+                        }
+                    },
+                    {
+                        "name": "min_today_sales",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешный запрос",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BooksListResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -236,6 +354,11 @@
                         "items": {
                             "$ref": "#/components/schemas/Author"
                         }
+                    },
+                    "sells_count": {
+                        "description": "Количество продаж книги",
+                        "type": "integer",
+                        "example": 15
                     },
                     "in_stock": {
                         "type": "boolean",

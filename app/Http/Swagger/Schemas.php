@@ -21,6 +21,7 @@ namespace App\Http\Swagger;
  *         type="array",
  *         @OA\Items(ref="#/components/schemas/Author")
  *     ),
+ *     @OA\Property(property="sells_count", type="integer", example=15, description="Количество продаж книги"),
  *     @OA\Property(property="in_stock", type="boolean", example=true),
  *     @OA\Property(property="created_at", type="string", format="date-time"),
  *     @OA\Property(property="updated_at", type="string", format="date-time")
