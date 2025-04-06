@@ -115,7 +115,7 @@ class BookApiController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"user_id"},
-     *             @OA\Property(property="user_id", type="integer", example=1),
+     *             @OA\Property(property="user_id", type="integer", example=1, description="ID клиента из таблицы spa_clients"),
      *             @OA\Property(property="quantity", type="integer", example=1, default=1)
      *         )
      *     ),

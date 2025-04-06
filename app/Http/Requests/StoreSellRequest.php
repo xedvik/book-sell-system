@@ -23,7 +23,7 @@ class StoreSellRequest extends FormRequest
     {
         return [
             'book_id' => 'required|exists:books,id',
-            'client_id' => 'required|exists:users,id',
+            'client_id' => 'required|exists:spa_clients,id',
             'price' => 'required|numeric|min:0',
         ];
     }

@@ -4,14 +4,14 @@ namespace Tests\Feature\Api;
 
 use App\Models\Book;
 use App\Models\Sell;
-use App\Models\User;
+use App\Models\SpaClient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class PurchaseApiTest extends TestCase
 {
     use RefreshDatabase;
-    protected User $user;
+    protected SpaClient $user;
     protected Book $availableBook;
     protected Book $limitedBook;
     protected Book $unavailableBook;
@@ -19,9 +19,11 @@ class PurchaseApiTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create([
+        $this->user = SpaClient::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'password' => bcrypt('password'),
+            'is_active' => true,
         ]);
 
         $this->availableBook = Book::factory()->create([

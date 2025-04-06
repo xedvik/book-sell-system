@@ -89,7 +89,7 @@
                                 <p class="text-sm text-gray-500">ID: {{ $sell->client_id }}</p>
                                 @if($sell->client)
                                     <p class="text-sm text-gray-500">{{ $sell->client->email }}</p>
-                                    <a href="{{ route('a-panel.users.show', $sell->client->id) }}" class="text-xs text-indigo-600 hover:text-indigo-900">Подробнее о клиенте →</a>
+                                    <a href="{{ route('a-panel.spa-clients.show', $sell->client->id) }}" class="text-xs text-indigo-600 hover:text-indigo-900">Подробнее о клиенте →</a>
                                 @endif
                             </div>
                         </div>

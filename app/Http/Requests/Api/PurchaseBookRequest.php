@@ -24,7 +24,7 @@ class PurchaseBookRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|integer|exists:users,id',
+            'user_id' => 'required|integer|exists:spa_clients,id',
             'quantity' => 'integer|min:1|max:100',
         ];
     }

@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Book;
-use App\Models\User;
+use App\Models\SpaClient;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sells', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Book::class);
-            $table->foreignIdFor(User::class, 'client_id');
+            $table->foreignIdFor(SpaClient::class, 'client_id');
             $table->float('price');
             $table->timestamps();
         });

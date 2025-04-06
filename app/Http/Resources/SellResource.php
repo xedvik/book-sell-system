@@ -18,6 +18,13 @@ class SellResource extends JsonResource
             'id' => $this->id,
             'book' => new BookResource($this->whenLoaded('book')),
             'client_id' => $this->client_id,
+            'client' => $this->whenLoaded('client', function () {
+                return [
+                    'id' => $this->client->id,
+                    'name' => $this->client->name,
+                    'email' => $this->client->email,
+                ];
+            }),
             'price' => (float) $this->price,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

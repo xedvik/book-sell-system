@@ -110,6 +110,49 @@ namespace App\Http\Swagger;
  *         nullable=true
  *     )
  * )
+ *
+ * @OA\Schema(
+ *     schema="SpaClient",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="Иван Петров"),
+ *     @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+ *     @OA\Property(property="phone", type="string", example="+7 (999) 123-45-67", nullable=true),
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="SpaClientListResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(
+ *         property="data",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/SpaClient")
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="SpaClientResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Клиент успешно создан"),
+ *     @OA\Property(property="data", ref="#/components/schemas/SpaClient")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="SpaClientErrorResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=false),
+ *     @OA\Property(property="message", type="string", example="Ошибка валидации"),
+ *     @OA\Property(
+ *         property="errors",
+ *         type="object",
+ *         @OA\Property(property="email", type="array", @OA\Items(type="string", example="Такой email уже существует"))
+ *     )
+ * )
  */
 class Schemas
 {
