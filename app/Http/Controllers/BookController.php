@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewBookAdded;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Models\Book;
 use App\Models\Author;
+
 class BookController extends Controller
 {
 
@@ -36,6 +38,8 @@ class BookController extends Controller
         if ($request->has('authors')) {
             $book->authors()->sync($request->authors);
         }
+
+        event(new NewBookAdded($book));
 
         return redirect()->route('a-panel.books');
     }

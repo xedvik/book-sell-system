@@ -15,10 +15,6 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Создаем 10 пользователей
-        $users = User::factory(10)->create();
-
-        // Создаем 10 SPA клиентов
         $spaClients = [];
         for ($i = 0; $i < 3; $i++) {
             $spaClients[] = SpaClient::create([
@@ -31,12 +27,12 @@ class DatabaseSeeder extends Seeder
         }
         $spaClients = collect($spaClients);
 
-        // Создаем 20 авторов
+
         $authors = Author::factory(20)->create();
 
-        // Создаем 50 книг и связываем с авторами
+
         $books = Book::factory(50)->create()->each(function ($book) use ($authors) {
-            // Каждая книга имеет от 1 до 3 авторов
+
             $book->authors()->attach(
                 $authors->random(rand(1, 3))->pluck('id')->toArray()
             );

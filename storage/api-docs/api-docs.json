@@ -172,6 +172,7 @@
                                 ],
                                 "properties": {
                                     "user_id": {
+                                        "description": "ID клиента из таблицы spa_clients",
                                         "type": "integer",
                                         "example": 1
                                     },
@@ -312,6 +313,235 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/BooksListResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/spa-clients": {
+            "get": {
+                "tags": [
+                    "SpaClients"
+                ],
+                "summary": "Получить список всех SPA клиентов",
+                "description": "Возвращает список всех клиентов SPA-приложения",
+                "operationId": "14e86d34a3300f931a73372cf05c9ae4",
+                "responses": {
+                    "200": {
+                        "description": "Успешный запрос",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SpaClientListResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "SpaClients"
+                ],
+                "summary": "Создать нового SPA клиента",
+                "description": "Создает нового клиента SPA-приложения",
+                "operationId": "552988cbf684fb8afed0bea7db997021",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Иван Петров"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+7 (999) 123-45-67"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Клиент успешно создан",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SpaClientResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SpaClientErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/spa-clients/{id}": {
+            "get": {
+                "tags": [
+                    "SpaClients"
+                ],
+                "summary": "Получить информацию о конкретном SPA клиенте",
+                "description": "Возвращает информацию о конкретном клиенте SPA-приложения по его ID",
+                "operationId": "9499f7d4f89db1abbd1f0f02ae1b7788",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID клиента",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешный запрос",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SpaClientResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Клиент не найден",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Клиент не найден"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "SpaClients"
+                ],
+                "summary": "Обновить данные SPA клиента",
+                "description": "Обновляет данные клиента SPA-приложения по его ID",
+                "operationId": "d760cd798f9a642c7e25c8b4ec4071ac",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID клиента",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Иван Петров"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+7 (999) 123-45-67"
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Клиент успешно обновлен",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SpaClientResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Клиент не найден",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Клиент не найден"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SpaClientErrorResponse"
                                 }
                             }
                         }
@@ -548,6 +778,97 @@
                     }
                 },
                 "type": "object"
+            },
+            "SpaClient": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Иван Петров"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "user@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+7 (999) 123-45-67",
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "SpaClientListResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SpaClient"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "SpaClientResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Клиент успешно создан"
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/SpaClient"
+                    }
+                },
+                "type": "object"
+            },
+            "SpaClientErrorResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Ошибка валидации"
+                    },
+                    "errors": {
+                        "properties": {
+                            "email": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "example": "Такой email уже существует"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
             }
         }
     },
@@ -555,6 +876,10 @@
         {
             "name": "Books",
             "description": "Операции с книгами"
+        },
+        {
+            "name": "SpaClients",
+            "description": "Операции с клиентами SPA"
         }
     ]
 }
