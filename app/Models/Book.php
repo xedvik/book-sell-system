@@ -49,7 +49,7 @@ class Book extends Model
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'ILIKE', "%{$search}%")
-                  ->orWhere('description', 'ILIKE', "%{$search}%");
+                    ->orWhere('description', 'ILIKE', "%{$search}%");
             });
         }
 
@@ -88,37 +88,18 @@ class Book extends Model
         $query = static::with('authors')->withCount('sells')->where('quantity', '>', 0);
 
         if (!empty($filters)) {
-            if (isset($filters['title'])) {
-                $query->where('title', 'ILIKE', "%{$filters['title']}%");
-            }
-
-            if (isset($filters['description'])) {
-                $query->where('description', 'ILIKE', "%{$filters['description']}%");
-            }
-
-            if (isset($filters['min_price'])) {
-                $query->where('price', '>=', $filters['min_price']);
-            }
-
-            if (isset($filters['max_price'])) {
-                $query->where('price', '<=', $filters['max_price']);
-            }
-
-            if (isset($filters['min_quantity'])) {
-                $query->where('quantity', '>=', $filters['min_quantity']);
-            }
+            static::applyCommonFilters($query, $filters);
         }
 
-        // Фильтр по наличию аватарки у авторов
         if ($withAuthorAvatar) {
-            $query->whereHas('authors', function($q) {
+            $query->whereHas('authors', function ($q) {
                 $q->whereNotNull('avatar_url')
-                  ->where('avatar_url', '!=', '');
+                    ->where('avatar_url', '!=', '');
             });
         }
 
         if ($sortField) {
-            $allowedSortFields = ['id', 'title', 'price', 'quantity', 'created_at','sells_count'];
+            $allowedSortFields = ['id', 'title', 'price', 'quantity', 'created_at', 'sells_count'];
             if (in_array($sortField, $allowedSortFields)) {
                 $query->orderBy($sortField, $sortDirection === 'desc' ? 'desc' : 'asc');
             }
@@ -146,30 +127,12 @@ class Book extends Model
             ->where('quantity', '>', 0);
 
         if (!empty($filters)) {
-            if (isset($filters['title'])) {
-                $query->where('title', 'ILIKE', "%{$filters['title']}%");
-            }
-
-            if (isset($filters['description'])) {
-                $query->where('description', 'ILIKE', "%{$filters['description']}%");
-            }
-
-            if (isset($filters['min_price'])) {
-                $query->where('price', '>=', $filters['min_price']);
-            }
-
-            if (isset($filters['max_price'])) {
-                $query->where('price', '<=', $filters['max_price']);
-            }
-
-            if (isset($filters['min_quantity'])) {
-                $query->where('quantity', '>=', $filters['min_quantity']);
-            }
+            static::applyCommonFilters($query, $filters);
         }
 
-        $query->where(function($q) use ($minAuthorRank, $minTodaySales) {
+        $query->where(function ($q) use ($minAuthorRank, $minTodaySales) {
 
-            $q->whereHas('authors', function($authorQuery) use ($minAuthorRank) {
+            $q->whereHas('authors', function ($authorQuery) use ($minAuthorRank) {
                 $authorQuery->where('rank', '>', $minAuthorRank);
             });
 
@@ -186,5 +149,36 @@ class Book extends Model
         }
 
         return $query->get();
+    }
+
+    /**
+     * Применить общие фильтры к запросу
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param array $filters
+     * @return void
+     */
+    private static function applyCommonFilters($query, array $filters = [])
+    {
+
+        if (isset($filters['title'])) {
+            $query->where('title', 'ILIKE', "%{$filters['title']}%");
+        }
+
+        if (isset($filters['description'])) {
+            $query->where('description', 'ILIKE', "%{$filters['description']}%");
+        }
+
+        if (isset($filters['min_price'])) {
+            $query->where('price', '>=', $filters['min_price']);
+        }
+
+        if (isset($filters['max_price'])) {
+            $query->where('price', '<=', $filters['max_price']);
+        }
+
+        if (isset($filters['min_quantity'])) {
+            $query->where('quantity', '>=', $filters['min_quantity']);
+        }
     }
 }

@@ -12,8 +12,8 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 Pusher.logToConsole = false;
 
-const pusher = new Pusher('8fb096f345a29c098f59', {
-    cluster: 'eu',
+const pusher = new Pusher(window.LaravelConfig.pusherKey, {
+    cluster: window.LaravelConfig.pusherCluster,
     enabledTransports: ['ws', 'wss']
 });
 

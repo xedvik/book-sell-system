@@ -35,13 +35,13 @@ class Author extends Model
         $query = static::withCount('books');
 
         if (!empty($search)) {
-            $searchTerms = explode(' ', strtolower($search));
+            $searchTerms = explode(' ', $search); // LOWER больше не нужен
 
-            $query->where(function($q) use ($searchTerms) {
+            $query->where(function ($q) use ($searchTerms) {
                 foreach ($searchTerms as $term) {
-                    $q->where(function($subq) use ($term) {
-                        $subq->whereRaw('LOWER(first_name) LIKE ?', ['%' . $term . '%'])
-                             ->orWhereRaw('LOWER(last_name) LIKE ?', ['%' . $term . '%']);
+                    $q->where(function ($subq) use ($term) {
+                        $subq->where('first_name', 'ILIKE', '%' . $term . '%')
+                            ->orWhere('last_name', 'ILIKE', '%' . $term . '%');
                     });
                 }
             });
