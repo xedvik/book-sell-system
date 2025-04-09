@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Cache;
 
 class Sell extends Model
 {
@@ -36,7 +37,7 @@ class Sell extends Model
     /**
      * Получить список продаж с фильтрацией
      *
-     * @param string|null $search Поисковый запрос
+     * @param string|null $search
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getFilteredSales($search = null)
@@ -47,7 +48,7 @@ class Sell extends Model
             $query->where('id', 'like', "%{$search}%");
         }
 
-        return $query->latest()->paginate(10);
+        return $query->latest()->paginate(config('pagination.per_page', 10));
     }
 
     /**
@@ -72,11 +73,47 @@ class Sell extends Model
     /**
      * Получить детальную информацию о продаже
      *
-     * @param int $id ID продажи
+     * @param int $id
      * @return Sell
      */
     public static function getSaleWithDetails($id)
     {
         return static::with(['book', 'client'])->findOrFail($id);
+    }
+
+    /**
+     * Модель загружена
+     */
+    protected static function booted()
+    {
+        static::saved(function ($sell) {
+            static::invalidateCache();
+            Book::invalidateCache();
+        });
+
+        static::deleted(function ($sell) {
+            static::invalidateCache();
+            Book::invalidateCache();
+        });
+    }
+
+    /**
+     * Очистить кэш, связанный с продажами
+     */
+    public static function invalidateCache()
+    {
+        Cache::forget('sales');
+        Cache::forget('stats');
+        Cache::forget('salesCount');
+        Cache::forget('latestSales');
+
+        $patterns = ['sell-*'];
+
+        foreach ($patterns as $pattern) {
+            $keys = Cache::get('cache_keys:' . $pattern, []);
+            foreach ($keys as $key) {
+                Cache::forget($key);
+            }
+        }
     }
 }

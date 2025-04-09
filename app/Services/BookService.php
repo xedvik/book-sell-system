@@ -3,9 +3,10 @@
 namespace App\Services;
 
 use App\Models\Book;
+use App\Models\Sell;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class BookService
 {
@@ -19,18 +20,23 @@ class BookService
     {
         $sortField = $request->input('sort_by');
         $sortDirection = $request->input('sort_direction', 'asc');
-
         $filters = $this->getFiltersFromRequest($request);
-
-        // Добавляем фильтр по наличию аватарки у автора
         $withAuthorAvatar = $request->has('with_author_avatar') ? (bool)$request->input('with_author_avatar') : false;
 
-        return Book::getAvailableBooks(
-            $filters,
-            $sortField,
-            $sortDirection,
-            $withAuthorAvatar
-        );
+        $cacheKey = 'books:available:' . md5(json_encode([
+            'sort' => $sortField . '-' . $sortDirection,
+            'filters' => $filters,
+            'withAuthorAvatar' => $withAuthorAvatar
+        ]));
+
+        return Cache::rememberKeyPattern($cacheKey, 'books:available:*', 60, function () use ($filters, $sortField, $sortDirection, $withAuthorAvatar) {
+            return Book::getAvailableBooks(
+                $filters,
+                $sortField,
+                $sortDirection,
+                $withAuthorAvatar
+            );
+        });
     }
 
     /**
@@ -41,7 +47,10 @@ class BookService
      */
     public function getBookDetails(int $id): ?Book
     {
-        return Book::with('authors')->find($id);
+        $cacheKey = 'book:' . $id;
+        return Cache::rememberKeyPattern($cacheKey, 'book:*', 60, function () use ($id) {
+            return Book::with('authors')->find($id);
+        });
     }
 
     /**
@@ -95,10 +104,8 @@ class BookService
      */
     public function getRequestFilters(Request $request): array
     {
-        // Получаем все базовые фильтры
         $filters = $this->getFiltersFromRequest($request);
 
-        // Исключаем специальные фильтры, которые обрабатываются отдельно
         if (isset($filters['with_author_avatar'])) {
             unset($filters['with_author_avatar']);
         }
@@ -122,13 +129,22 @@ class BookService
         $minAuthorRank = $request->input('min_author_rank', 75);
         $minTodaySales = $request->input('min_today_sales', 3);
 
-        return Book::getBooksHighRankOrTopSales(
-            $filters,
-            $sortField,
-            $sortDirection,
-            $minAuthorRank,
-            $minTodaySales
-        );
+        $cacheKey = 'books:top:' . md5(json_encode([
+            'sort' => $sortField . '-' . $sortDirection,
+            'filters' => $filters,
+            'minAuthorRank' => $minAuthorRank,
+            'minTodaySales' => $minTodaySales
+        ]));
+
+        return Cache::rememberKeyPattern($cacheKey, 'books:top:*', 60, function () use ($filters, $sortField, $sortDirection, $minAuthorRank, $minTodaySales) {
+            return Book::getBooksHighRankOrTopSales(
+                $filters,
+                $sortField,
+                $sortDirection,
+                $minAuthorRank,
+                $minTodaySales
+            );
+        });
     }
 
     /**
@@ -180,6 +196,11 @@ class BookService
                 'sell' => $sell
             ];
         });
+
+        if ($result['success']) {
+            Book::invalidateCache();
+            Sell::invalidateCache();
+        }
 
         return $result;
     }

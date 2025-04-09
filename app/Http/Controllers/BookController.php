@@ -7,17 +7,18 @@ use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use App\Models\Book;
 use App\Models\Author;
-
+use Illuminate\Support\Facades\Cache;
 class BookController extends Controller
 {
 
     public function index()
     {
-        $books = Book::getFilteredBooks(
-            request('search'),
-            request('sort')
-        );
+        $page = request()->get('page', 1);
+        $search = request()->get('search');
+        $sort = request()->get('sort');
+        $cacheKey = 'books:page:' . $page . ':search:' . ($search ?? 'none') . ':sort:' . ($sort ?? 'none');
 
+        $books = Book::getFilteredBooks($search, $sort);
         $books->appends(request()->query());
 
         return view('a-panel.books.index', compact('books'));
@@ -26,7 +27,9 @@ class BookController extends Controller
 
     public function create()
     {
-        $authors = Author::all();
+        $authors = Cache::remember('authors', 60, function () {
+            return Author::all();
+        });
         return view('a-panel.books.create', compact('authors'));
     }
 
@@ -40,21 +43,25 @@ class BookController extends Controller
         }
 
         event(new NewBookAdded($book));
-
+        Book::invalidateCache();
         return redirect()->route('a-panel.books');
     }
 
 
-    public function show(Book $book)
+    public function show($id)
     {
-        $book->load('authors');
+        $book = Cache::rememberKeyPattern('book-' . $id, 'book-*', 60, function () use ($id) {
+            return Book::with('authors')->withCount('authors')->findOrFail($id);
+        });
         return view('a-panel.books.show', compact('book'));
     }
 
 
     public function edit(Book $book)
     {
-        $authors = Author::all();
+        $authors = Cache::remember('authors', 60, function () {
+            return Author::all();
+        });
         return view('a-panel.books.edit', compact('book', 'authors'));
     }
 
@@ -66,6 +73,7 @@ class BookController extends Controller
             $book->authors()->sync($request->authors);
         }
 
+        Book::invalidateCache();
         return redirect()->route('a-panel.books');
     }
 
@@ -73,6 +81,7 @@ class BookController extends Controller
     public function destroy(Book $book)
     {
         $book->delete();
+        Book::invalidateCache();
         return redirect()->route('a-panel.books');
     }
 }

@@ -55,6 +55,6 @@ class User extends Authenticatable
             });
         }
 
-        return $query->latest()->paginate(10);
+        return $query->latest()->paginate(config('pagination.per_page', 10));
     }
 }

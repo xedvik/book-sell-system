@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class Book extends Model
 {
@@ -71,7 +72,7 @@ class Book extends Model
                 break;
         }
 
-        return $query->paginate(10);
+        return $query->paginate(config('pagination.per_page', 10));
     }
 
     /**
@@ -179,6 +180,33 @@ class Book extends Model
 
         if (isset($filters['min_quantity'])) {
             $query->where('quantity', '>=', $filters['min_quantity']);
+        }
+    }
+
+    /**
+     * Очистить кэш, связанный с книгами
+     */
+    public static function invalidateCache()
+    {
+        // Очищаем все кэши, связанные с книгами
+        Cache::forget('books');
+        Cache::forget('booksCount');
+        Cache::forget('latestBooks');
+
+        // Паттерн-очистка для динамических ключей
+        $patterns = [
+            'books:available:*',
+            'books:top:*',
+            'books:page:*',
+            'book:*',
+            'book-*'
+        ];
+
+        foreach ($patterns as $pattern) {
+            $keys = Cache::get('cache_keys:' . $pattern, []);
+            foreach ($keys as $key) {
+                Cache::forget($key);
+            }
         }
     }
 }

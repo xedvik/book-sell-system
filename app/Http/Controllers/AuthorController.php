@@ -6,12 +6,17 @@ use App\Http\Requests\StoreAuthorRequest;
 use App\Http\Requests\UpdateAuthorRequest;
 use App\Models\Author;
 use App\Models\Book;
+use Illuminate\Support\Facades\Cache;
 class AuthorController extends Controller
 {
 
     public function index()
     {
-        $authors = Author::getFilteredAuthors(request('search'));
+
+        $page = request()->get('page', 1);
+        $search = request()->get('search');
+
+        $authors = Author::getFilteredAuthors($search);
 
         $authors->appends(request()->query());
 
@@ -21,7 +26,9 @@ class AuthorController extends Controller
 
     public function create()
     {
-        $books = Book::all();
+        $books = Cache::remember('books', 60, function () {
+            return Book::all();
+        });
         return view('a-panel.authors.create', compact('books'));
     }
 
@@ -29,21 +36,26 @@ class AuthorController extends Controller
     public function store(StoreAuthorRequest $request)
     {
         $author = Author::create($request->validated());
+        Author::invalidateCache();
         return redirect()->route('a-panel.authors');
     }
 
 
-    public function show(Author $author)
+    public function show($id)
     {
-        // Используем автоматическое внедрение модели Laravel, но добавляем loadCount
-        $author->loadCount('books');
+        $author = Cache::rememberKeyPattern('author-' . $id, 'author-*', 60, function () use ($id) {
+            return Author::with('books')->withCount('books')->findOrFail($id);
+        });
+
         return view('a-panel.authors.show', compact('author'));
     }
 
 
     public function edit(Author $author)
     {
-        $books = Book::all();
+        $books = Cache::remember('books', 60, function () {
+            return Book::all();
+        });
         return view('a-panel.authors.edit', compact('author', 'books'));
     }
 
@@ -51,6 +63,7 @@ class AuthorController extends Controller
     public function update(UpdateAuthorRequest $request, Author $author)
     {
         $author->update($request->validated());
+        Author::invalidateCache();
         return redirect()->route('a-panel.authors');
     }
 
@@ -58,6 +71,7 @@ class AuthorController extends Controller
     public function destroy(Author $author)
     {
         $author->delete();
+        Author::invalidateCache();
         return redirect()->route('a-panel.authors');
     }
 }

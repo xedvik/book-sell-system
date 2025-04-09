@@ -13,6 +13,7 @@ services:
       - app-network
     depends_on:
       - db
+      - redis
 
   nginx:
     image: nginx:alpine
@@ -49,6 +50,38 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:alpine
+    container_name: laravel-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  supervisor:
+    build:
+      context: .
+      dockerfile: docker/supervisor/Dockerfile
+    container_name: laravel-supervisor
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www
+      - ./docker/supervisor/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+    networks:
+      - app-network
+    depends_on:
+      - app
+      - redis
+      - db
+
   node:
     image: node:lts
     container_name: laravel-node
@@ -68,3 +101,4 @@ networks:
 
 volumes:
   pgdata:
+  redis-data:
