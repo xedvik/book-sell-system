@@ -6,8 +6,8 @@ use App\Models\Author;
 use App\Models\Book;
 use App\Models\Sell;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+
 class DashboardController extends Controller
 {
     /**

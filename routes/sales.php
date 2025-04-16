@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\SellController;
 use Illuminate\Support\Facades\Route;
 

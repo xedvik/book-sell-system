@@ -3,7 +3,6 @@
 namespace Tests\Feature\Api;
 
 use App\Models\Book;
-use App\Models\Sell;
 use App\Models\SpaClient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -11,10 +10,15 @@ use Tests\TestCase;
 class PurchaseApiTest extends TestCase
 {
     use RefreshDatabase;
+
     protected SpaClient $user;
+
     protected Book $availableBook;
+
     protected Book $limitedBook;
+
     protected Book $unavailableBook;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -50,7 +54,7 @@ class PurchaseApiTest extends TestCase
      */
     public function test_successful_book_purchase(): void
     {
-        $response = $this->postJson('/api/books/' . $this->availableBook->id . '/purchase', [
+        $response = $this->postJson('/api/books/'.$this->availableBook->id.'/purchase', [
             'user_id' => $this->user->id,
             'quantity' => 1,
         ]);
@@ -65,13 +69,11 @@ class PurchaseApiTest extends TestCase
                     'book',
                     'quantity',
                     'total_price',
-                    'sale'
-                ]
+                    'sale',
+                ],
             ]);
 
-
         $this->assertEquals(9, Book::find($this->availableBook->id)->quantity);
-
 
         $this->assertDatabaseHas('sells', [
             'book_id' => $this->availableBook->id,
@@ -85,7 +87,7 @@ class PurchaseApiTest extends TestCase
      */
     public function test_purchase_multiple_copies(): void
     {
-        $response = $this->postJson('/api/books/' . $this->availableBook->id . '/purchase', [
+        $response = $this->postJson('/api/books/'.$this->availableBook->id.'/purchase', [
             'user_id' => $this->user->id,
             'quantity' => 3,
         ]);
@@ -95,7 +97,6 @@ class PurchaseApiTest extends TestCase
             ->assertJsonPath('data.quantity', 3)
             ->assertJsonPath('data.total_price', 3000);
 
-
         $this->assertEquals(7, Book::find($this->availableBook->id)->quantity);
     }
 
@@ -104,14 +105,13 @@ class PurchaseApiTest extends TestCase
      */
     public function test_purchase_limited_book(): void
     {
-        $response = $this->postJson('/api/books/' . $this->limitedBook->id . '/purchase', [
+        $response = $this->postJson('/api/books/'.$this->limitedBook->id.'/purchase', [
             'user_id' => $this->user->id,
             'quantity' => 1,
         ]);
 
         $response->assertStatus(201)
             ->assertJsonPath('status', 'success');
-
 
         $this->assertEquals(0, Book::find($this->limitedBook->id)->quantity);
     }
@@ -121,7 +121,7 @@ class PurchaseApiTest extends TestCase
      */
     public function test_purchase_unavailable_book(): void
     {
-        $response = $this->postJson('/api/books/' . $this->unavailableBook->id . '/purchase', [
+        $response = $this->postJson('/api/books/'.$this->unavailableBook->id.'/purchase', [
             'user_id' => $this->user->id,
             'quantity' => 1,
         ]);
@@ -136,7 +136,7 @@ class PurchaseApiTest extends TestCase
      */
     public function test_purchase_insufficient_quantity(): void
     {
-        $response = $this->postJson('/api/books/' . $this->availableBook->id . '/purchase', [
+        $response = $this->postJson('/api/books/'.$this->availableBook->id.'/purchase', [
             'user_id' => $this->user->id,
             'quantity' => 20,
         ]);
@@ -166,7 +166,7 @@ class PurchaseApiTest extends TestCase
      */
     public function test_purchase_without_user(): void
     {
-        $response = $this->postJson('/api/books/' . $this->availableBook->id . '/purchase', [
+        $response = $this->postJson('/api/books/'.$this->availableBook->id.'/purchase', [
             'quantity' => 1,
         ]);
 
@@ -175,8 +175,8 @@ class PurchaseApiTest extends TestCase
                 'status',
                 'message',
                 'errors' => [
-                    'user_id'
-                ]
+                    'user_id',
+                ],
             ]);
     }
 
@@ -185,7 +185,7 @@ class PurchaseApiTest extends TestCase
      */
     public function test_purchase_with_invalid_quantity(): void
     {
-        $response = $this->postJson('/api/books/' . $this->availableBook->id . '/purchase', [
+        $response = $this->postJson('/api/books/'.$this->availableBook->id.'/purchase', [
             'user_id' => $this->user->id,
             'quantity' => -1,
         ]);
@@ -195,8 +195,8 @@ class PurchaseApiTest extends TestCase
                 'status',
                 'message',
                 'errors' => [
-                    'quantity'
-                ]
+                    'quantity',
+                ],
             ]);
     }
 }

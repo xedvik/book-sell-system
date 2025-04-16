@@ -10,6 +10,7 @@ namespace App\Http\Swagger;
  * @OA\Schema(
  *     schema="Book",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="title", type="string", example="Название книги"),
  *     @OA\Property(property="description", type="string", example="Описание книги"),
@@ -19,8 +20,10 @@ namespace App\Http\Swagger;
  *     @OA\Property(
  *         property="authors",
  *         type="array",
+ *
  *         @OA\Items(ref="#/components/schemas/Author")
  *     ),
+ *
  *     @OA\Property(property="sells_count", type="integer", example=15, description="Количество продаж книги"),
  *     @OA\Property(property="in_stock", type="boolean", example=true),
  *     @OA\Property(property="created_at", type="string", format="date-time"),
@@ -30,6 +33,7 @@ namespace App\Http\Swagger;
  * @OA\Schema(
  *     schema="Author",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="first_name", type="string", example="Иван"),
  *     @OA\Property(property="last_name", type="string", example="Иванов"),
@@ -44,6 +48,7 @@ namespace App\Http\Swagger;
  * @OA\Schema(
  *     schema="Sale",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="book", ref="#/components/schemas/Book"),
  *     @OA\Property(property="client_id", type="integer", example=1),
@@ -55,12 +60,15 @@ namespace App\Http\Swagger;
  * @OA\Schema(
  *     schema="BooksListResponse",
  *     type="object",
+ *
  *     @OA\Property(property="status", type="string", example="success"),
  *     @OA\Property(
  *         property="data",
  *         type="array",
+ *
  *         @OA\Items(ref="#/components/schemas/Book")
  *     ),
+ *
  *     @OA\Property(
  *         property="meta",
  *         type="object",
@@ -78,6 +86,7 @@ namespace App\Http\Swagger;
  * @OA\Schema(
  *     schema="BookDetailResponse",
  *     type="object",
+ *
  *     @OA\Property(property="status", type="string", example="success"),
  *     @OA\Property(property="data", ref="#/components/schemas/Book")
  * )
@@ -85,6 +94,7 @@ namespace App\Http\Swagger;
  * @OA\Schema(
  *     schema="PurchaseResponse",
  *     type="object",
+ *
  *     @OA\Property(property="status", type="string", example="success"),
  *     @OA\Property(property="message", type="string"),
  *     @OA\Property(
@@ -101,6 +111,7 @@ namespace App\Http\Swagger;
  * @OA\Schema(
  *     schema="ErrorResponse",
  *     type="object",
+ *
  *     @OA\Property(property="status", type="string", example="error"),
  *     @OA\Property(property="message", type="string"),
  *     @OA\Property(
@@ -114,6 +125,7 @@ namespace App\Http\Swagger;
  * @OA\Schema(
  *     schema="SpaClient",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Иван Петров"),
  *     @OA\Property(property="email", type="string", format="email", example="user@example.com"),
@@ -126,10 +138,12 @@ namespace App\Http\Swagger;
  * @OA\Schema(
  *     schema="SpaClientListResponse",
  *     type="object",
+ *
  *     @OA\Property(property="success", type="boolean", example=true),
  *     @OA\Property(
  *         property="data",
  *         type="array",
+ *
  *         @OA\Items(ref="#/components/schemas/SpaClient")
  *     )
  * )
@@ -137,6 +151,7 @@ namespace App\Http\Swagger;
  * @OA\Schema(
  *     schema="SpaClientResponse",
  *     type="object",
+ *
  *     @OA\Property(property="success", type="boolean", example=true),
  *     @OA\Property(property="message", type="string", example="Клиент успешно создан"),
  *     @OA\Property(property="data", ref="#/components/schemas/SpaClient")
@@ -145,6 +160,7 @@ namespace App\Http\Swagger;
  * @OA\Schema(
  *     schema="SpaClientErrorResponse",
  *     type="object",
+ *
  *     @OA\Property(property="success", type="boolean", example=false),
  *     @OA\Property(property="message", type="string", example="Ошибка валидации"),
  *     @OA\Property(

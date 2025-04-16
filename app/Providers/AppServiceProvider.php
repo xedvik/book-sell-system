@@ -3,10 +3,10 @@
 namespace App\Providers;
 
 use App\Services\BookService;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
             $result = Cache::remember($key, $ttl, $callback);
 
             $patternKeys = Cache::get('cache_keys:' . $pattern, []);
-            if (!in_array($key, $patternKeys)) {
+            if (! in_array($key, $patternKeys)) {
                 $patternKeys[] = $key;
                 Cache::put('cache_keys:' . $pattern, $patternKeys, $ttl);
             }

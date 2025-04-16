@@ -5,17 +5,18 @@ namespace App\Events;
 use App\Models\Book;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 class NewBookAdded implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public $book;
+
     public function __construct(Book $book)
     {
         $this->book = $book;
@@ -30,6 +31,7 @@ class NewBookAdded implements ShouldBroadcast
             new Channel('books'),
         ];
     }
+
     public function broadcastAs(): string
     {
         return 'book.added';

@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
 class Book extends Model
@@ -20,9 +19,8 @@ class Book extends Model
         'quantity',
     ];
 
-
     protected $casts = [
-        'price' => 'decimal:2'
+        'price' => 'decimal:2',
     ];
 
     public function authors()
@@ -39,15 +37,15 @@ class Book extends Model
     /**
      * Получить список книг с фильтрацией и сортировкой
      *
-     * @param string|null $search
-     * @param string|null $sort
+     * @param  string|null  $search
+     * @param  string|null  $sort
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getFilteredBooks($search = null, $sort = null)
     {
-        $query = static::with('authors')->where('quantity', '>', 0);;
+        $query = static::with('authors')->where('quantity', '>', 0);
 
-        if (!empty($search)) {
+        if (! empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'ILIKE', "%{$search}%")
                     ->orWhere('description', 'ILIKE', "%{$search}%");
@@ -78,17 +76,16 @@ class Book extends Model
     /**
      * Получить список книг в продаже с возможностью фильтрации и сортировки
      *
-     * @param array $filters
-     * @param string|null $sortField
-     * @param string $sortDirection
-     * @param bool $withAuthorAvatar
+     * @param  string|null  $sortField
+     * @param  string  $sortDirection
+     * @param  bool  $withAuthorAvatar
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getAvailableBooks(array $filters = [], $sortField = null, $sortDirection = 'asc', $withAuthorAvatar = false)
     {
         $query = static::with('authors')->withCount('sells')->where('quantity', '>', 0);
 
-        if (!empty($filters)) {
+        if (! empty($filters)) {
             static::applyCommonFilters($query, $filters);
         }
 
@@ -114,11 +111,10 @@ class Book extends Model
     /**
      * Получить книги авторов с высоким рейтингом или с большим количеством продаж за сегодня
      *
-     * @param array $filters
-     * @param string|null $sortField
-     * @param string $sortDirection
-     * @param int $minAuthorRank
-     * @param int $minTodaySales
+     * @param  string|null  $sortField
+     * @param  string  $sortDirection
+     * @param  int  $minAuthorRank
+     * @param  int  $minTodaySales
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getBooksHighRankOrTopSales(array $filters = [], $sortField = null, $sortDirection = 'asc', $minAuthorRank = 75, $minTodaySales = 3)
@@ -127,7 +123,7 @@ class Book extends Model
             ->withCount('sells')
             ->where('quantity', '>', 0);
 
-        if (!empty($filters)) {
+        if (! empty($filters)) {
             static::applyCommonFilters($query, $filters);
         }
 
@@ -155,8 +151,7 @@ class Book extends Model
     /**
      * Применить общие фильтры к запросу
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param array $filters
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
     private static function applyCommonFilters($query, array $filters = [])
@@ -199,7 +194,7 @@ class Book extends Model
             'books:top:*',
             'books:page:*',
             'book:*',
-            'book-*'
+            'book-*',
         ];
 
         foreach ($patterns as $pattern) {

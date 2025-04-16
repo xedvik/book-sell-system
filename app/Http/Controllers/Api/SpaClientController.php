@@ -19,7 +19,6 @@ class SpaClientController extends Controller
     /**
      * Создать нового SPA клиента
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      *
      * @OA\Post(
@@ -27,24 +26,31 @@ class SpaClientController extends Controller
      *     tags={"SpaClients"},
      *     summary="Создать нового SPA клиента",
      *     description="Создает нового клиента SPA-приложения",
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"name", "email", "password"},
+     *
      *             @OA\Property(property="name", type="string", example="Иван Петров"),
      *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
      *             @OA\Property(property="password", type="string", format="password", example="password123"),
      *             @OA\Property(property="phone", type="string", example="+7 (999) 123-45-67"),
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Клиент успешно создан",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/SpaClientResponse")
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Ошибка валидации",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/SpaClientErrorResponse")
      *     )
      * )
@@ -62,7 +68,7 @@ class SpaClientController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка валидации',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -77,7 +83,7 @@ class SpaClientController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Клиент успешно создан',
-            'data' => $client
+            'data' => $client,
         ], 201);
     }
 
@@ -91,9 +97,11 @@ class SpaClientController extends Controller
      *     tags={"SpaClients"},
      *     summary="Получить список всех SPA клиентов",
      *     description="Возвращает список всех клиентов SPA-приложения",
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Успешный запрос",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/SpaClientListResponse")
      *     )
      * )
@@ -104,7 +112,7 @@ class SpaClientController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $clients
+            'data' => $clients,
         ]);
     }
 
@@ -119,22 +127,29 @@ class SpaClientController extends Controller
      *     tags={"SpaClients"},
      *     summary="Получить информацию о конкретном SPA клиенте",
      *     description="Возвращает информацию о конкретном клиенте SPA-приложения по его ID",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID клиента",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Успешный запрос",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/SpaClientResponse")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Клиент не найден",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Клиент не найден")
      *         )
@@ -145,23 +160,22 @@ class SpaClientController extends Controller
     {
         $client = SpaClient::find($id);
 
-        if (!$client) {
+        if (! $client) {
             return response()->json([
                 'success' => false,
-                'message' => 'Клиент не найден'
+                'message' => 'Клиент не найден',
             ], 404);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $client
+            'data' => $client,
         ]);
     }
 
     /**
      * Обновить данные клиента
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      *
@@ -170,37 +184,49 @@ class SpaClientController extends Controller
      *     tags={"SpaClients"},
      *     summary="Обновить данные SPA клиента",
      *     description="Обновляет данные клиента SPA-приложения по его ID",
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID клиента",
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="name", type="string", example="Иван Петров"),
      *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
      *             @OA\Property(property="phone", type="string", example="+7 (999) 123-45-67"),
      *             @OA\Property(property="is_active", type="boolean", example=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Клиент успешно обновлен",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/SpaClientResponse")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Клиент не найден",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Клиент не найден")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Ошибка валидации",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/SpaClientErrorResponse")
      *     )
      * )
@@ -209,10 +235,10 @@ class SpaClientController extends Controller
     {
         $client = SpaClient::find($id);
 
-        if (!$client) {
+        if (! $client) {
             return response()->json([
                 'success' => false,
-                'message' => 'Клиент не найден'
+                'message' => 'Клиент не найден',
             ], 404);
         }
 
@@ -227,7 +253,7 @@ class SpaClientController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Ошибка валидации',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -236,7 +262,7 @@ class SpaClientController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Клиент успешно обновлен',
-            'data' => $client
+            'data' => $client,
         ]);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,16 +18,13 @@ Route::get('/', function () {
     return view('/a-panel');
 });
 
-
-
-
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/a-panel', [DashboardController::class, 'index'])->name('a-panel.dashboard');
-    require __DIR__ . '/books.php';
-    require __DIR__ . '/author.php';
-    require __DIR__ . '/users.php';
-    require __DIR__ . '/profile.php';
-    require __DIR__ . '/sales.php';
+    require __DIR__.'/books.php';
+    require __DIR__.'/author.php';
+    require __DIR__.'/users.php';
+    require __DIR__.'/profile.php';
+    require __DIR__.'/sales.php';
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

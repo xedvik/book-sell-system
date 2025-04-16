@@ -4,10 +4,9 @@ namespace Tests\Feature\Api;
 
 use App\Models\Author;
 use App\Models\Book;
-use App\Models\User;
+use Faker\Factory as Faker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Faker\Factory as Faker;
 
 class BookApiTest extends TestCase
 {
@@ -54,7 +53,6 @@ class BookApiTest extends TestCase
             'quantity' => 0,
         ]);
 
-
         $book1->authors()->attach($author1->id);
         $book2->authors()->attach($author2->id);
         $book3->authors()->attach($author1->id);
@@ -80,13 +78,13 @@ class BookApiTest extends TestCase
                         'quantity',
                         'in_stock',
                         'authors',
-                    ]
+                    ],
                 ],
                 'meta' => [
                     'filters',
                     'sort',
-                    'total_count'
-                ]
+                    'total_count',
+                ],
             ]);
     }
 
@@ -150,7 +148,7 @@ class BookApiTest extends TestCase
                     'quantity',
                     'in_stock',
                     'authors',
-                ]
+                ],
             ]);
     }
 

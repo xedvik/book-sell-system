@@ -10,14 +10,12 @@ class Author extends Model
 {
     use HasFactory;
 
-
     protected $fillable = [
         'first_name',
         'last_name',
         'rank',
         'avatar_url',
     ];
-
 
     public function books()
     {
@@ -28,14 +26,14 @@ class Author extends Model
     /**
      * Получить список авторов с фильтрацией
      *
-     * @param string|null $search
+     * @param  string|null  $search
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public static function getFilteredAuthors($search = null)
     {
         $query = static::withCount('books');
 
-        if (!empty($search)) {
+        if (! empty($search)) {
             $searchTerms = explode(' ', $search);
 
             $query->where(function ($q) use ($searchTerms) {
@@ -54,7 +52,7 @@ class Author extends Model
     /**
      * Загрузить автора с количеством книг
      *
-     * @param int $id
+     * @param  int  $id
      * @return Author
      */
     public static function getAuthorWithBooksCount($id)
@@ -73,7 +71,6 @@ class Author extends Model
             Book::invalidateCache();
         });
 
-
         static::deleted(function ($author) {
             static::invalidateCache();
             Book::invalidateCache();
@@ -88,7 +85,6 @@ class Author extends Model
 
         Cache::forget('authors');
         Cache::forget('authorsCount');
-
 
         $patterns = ['author-*'];
 

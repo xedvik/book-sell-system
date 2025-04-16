@@ -3,13 +3,11 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\Sell;
 use App\Models\SpaClient;
-use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -27,9 +25,7 @@ class DatabaseSeeder extends Seeder
         }
         $spaClients = collect($spaClients);
 
-
         $authors = Author::factory(20)->create();
-
 
         $books = Book::factory(50)->create()->each(function ($book) use ($authors) {
 
@@ -45,7 +41,7 @@ class DatabaseSeeder extends Seeder
             Sell::create([
                 'book_id' => $book->id,
                 'client_id' => $spaClient->id,
-                'price' => $book->price * rand(1, 3)
+                'price' => $book->price * rand(1, 3),
             ]);
         }
     }

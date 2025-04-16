@@ -16,12 +16,10 @@ class UserController extends Controller
         return view('a-panel.users.index', compact('users'));
     }
 
-
     // public function create()
     // {
     //     return view('a-panel.users.create');
     // }
-
 
     // public function store(Request $request)
     // {
@@ -40,19 +38,16 @@ class UserController extends Controller
     //     return redirect()->route('a-panel.users')->with('success', 'Пользователь успешно создан');
     // }
 
-
     // public function show(User $user)
     // {
     //     $user->loadCount('purchases');
     //     return view('a-panel.users.show', compact('user'));
     // }
 
-
     // public function edit(User $user)
     // {
     //     return view('a-panel.users.edit', compact('user'));
     // }
-
 
     // public function update(Request $request, User $user)
     // {
@@ -82,6 +77,7 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
+
         return redirect()->route('a-panel.users')->with('success', 'Пользователь успешно удален');
     }
 }
